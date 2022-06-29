@@ -21,7 +21,7 @@ from optimizer import build_optimizer
 from lr_scheduler import build_lr_scheduler
 from utils.misc import AverageMeter
 from utils.mode import Mode, RunScope
-from utils.utility import get_num_trainers
+from utils.utility import get_num_trainers, get_trainer_id
 import models
 
 import dllogger
@@ -143,6 +143,12 @@ def create_strategy(args, is_train=True):
         build_strategy.fuse_elewise_add_act_ops = True
         build_strategy.fuse_bn_add_act_ops = True
         build_strategy.enable_addto = True
+
+    if args.qat:
+        build_strategy.fuse_bn_add_act_ops = False
+        if is_train:
+            build_strategy.num_trainers = get_num_trainers()
+            build_strategy.trainer_id = get_trainer_id()
 
     return build_strategy, exec_strategy
 

@@ -295,6 +295,13 @@ def add_advance_args(parser):
              '{mask_1d, mask_2d_greedy, mask_2d_best}. This only be applied ' \
              'when --asp and --prune-model is set.'
     )
+
+    # QAT
+    group.add_argument(
+        '--qat',
+        action='store_true',
+        help='Enable quantization aware training(QAT).'
+    )
     return parser
 
 

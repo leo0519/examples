@@ -21,6 +21,7 @@ from utils.mode import Mode
 from utils.save_load import init_ckpt
 from utils.logger import setup_dllogger
 from utils.config import parse_args, print_args
+from utils.quant import quant_aware, quant_convert, convert_scale_fp16
 
 
 def main(args):
@@ -49,14 +50,17 @@ def main(args):
     exe.run(startup_prog)
 
     path_to_ckpt = args.from_checkpoint
+    assert path_to_ckpt is not None, \
+        'The --from-checkpoint is not set, model weights will not be initialize.'
+    logging.info('Checkpoint path is %s', path_to_ckpt)
 
-    if path_to_ckpt is None:
-        logging.warning(
-            'The --from-checkpoint is not set, model weights will not be initialize.'
-        )
+    if args.qat:
+        eval_prog = quant_aware(eval_prog, exe.place)
+        convert_scale_fp16(path_to_ckpt)
+        init_ckpt(path_to_ckpt, eval_prog, exe)
+        eval_prog = quant_convert(eval_prog, exe.place)
     else:
         init_ckpt(path_to_ckpt, eval_prog, exe)
-        logging.info('Checkpoint path is %s', path_to_ckpt)
 
     save_inference_dir = args.trt_inference_dir
     paddle.static.save_inference_model(

@@ -25,6 +25,7 @@ from utils.logger import setup_dllogger
 from utils.save_load import init_program, save_model
 from utils.affinity import set_cpu_affinity
 from utils.mode import Mode, RunScope
+from utils.quant import quant_aware
 import program
 
 
@@ -129,6 +130,12 @@ def main(args):
         logging.info("Pruning model to 2:4 sparse pattern...")
         sparsity.prune_model(train_prog, mask_algo=args.mask_algo)
         logging.info("Pruning model done.")
+
+    if args.qat:
+        train_prog = quant_aware(train_prog, exe.place)
+        train_prog._graph = program.compile_prog(args, train_prog, loss_name=train_fetchs['loss'][0].name, is_train=True)
+        if eval_prog is not None:
+            eval_prog = quant_aware(eval_prog, exe.place, for_test=True)
 
     if eval_prog is not None:
         eval_prog = program.compile_prog(args, eval_prog, is_train=False)
