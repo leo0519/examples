@@ -4,7 +4,7 @@ Original README.md [link](https://github.com/NVIDIA/DeepLearningExamples/blob/ma
 ## Workaround and Issue ##
 1. Duplicate code
 
-The code in `utils/quant.py` is similar to PaddleSlim. They both call the same pass to modify the IR graph converted from program.
+The code in `utils/quant.py` is similar to PaddleSlim. They both call the same passes to modify the IR graph that is converted from the program.
 
 ```python
 # utils/quant.py
@@ -35,11 +35,11 @@ if args.qat:
 ```
 Source: [program.py L147-151](https://github.com/leo0519/DeepLearningExamples/blob/paddle-qat/PaddlePaddle/Classification/RN50v1.5/program.py#L147-L151)
 
-Whether a compilation strategy should be open can be determined by distributed optimizer according to the flag of QAT.
+Whether a compilation strategy is open or not can be determined by the distributed optimizer according to the flag of QAT.
 
 3. Low level API
 
-In `train.py`, we need to call low level QAT API and compile the program again.
+In `train.py`, we need to call a low level QAT API and compile the program again.
 ```python
 # train.py
 if args.qat:
@@ -51,7 +51,7 @@ if args.qat:
 ```
 Source: [train.py L134-138](https://github.com/leo0519/DeepLearningExamples/blob/paddle-qat/PaddlePaddle/Classification/RN50v1.5/train.py#L134-L138)
 
-These functions should be integrated into distributed optimizer, so end-users can simply open the QAT flag to generate QAT train program.
+These functions should be integrated into the distributed optimizer, so end-users can simply open the QAT flag to generate a QAT train program.
 
 4. FP16 scale
 
@@ -91,3 +91,4 @@ bash scripts/inference/export_resnet50_QAT.sh <path to preferred checkpoint>
 ```bash
 bash scripts/inference/infer_resnet50_QAT.sh
 ```
+
